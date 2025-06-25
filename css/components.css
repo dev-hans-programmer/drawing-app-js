@@ -1,0 +1,317 @@
+/* Toolbar Styles */
+.toolbar {
+    grid-area: toolbar;
+    background-color: var(--surface-color);
+    border-bottom: 1px solid var(--border-color);
+    padding: 0 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: var(--shadow);
+    z-index: 100;
+}
+
+.toolbar-left,
+.toolbar-center,
+.toolbar-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.toolbar-center {
+    flex: 1;
+    justify-content: center;
+}
+
+.logo {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--primary-color);
+}
+
+/* Tool Button Styles */
+.tool-btn {
+    width: 40px;
+    height: 40px;
+    border: none;
+    border-radius: 8px;
+    background-color: transparent;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+}
+
+.tool-btn:hover {
+    background-color: var(--background-color);
+    color: var(--text-primary);
+}
+
+.tool-btn.active {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+.tool-btn svg {
+    width: 20px;
+    height: 20px;
+}
+
+/* Canvas Container */
+.canvas-container {
+    grid-area: canvas;
+    position: relative;
+    overflow: hidden;
+    background-color: var(--surface-color);
+    background-image: 
+        radial-gradient(circle, var(--border-color) 1px, transparent 1px);
+    background-size: 20px 20px;
+}
+
+.canvas-wrapper {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    cursor: crosshair;
+}
+
+.drawing-canvas {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    border: 1px solid var(--border-color);
+    background-color: white;
+    box-shadow: var(--shadow-lg);
+}
+
+/* Sidebar */
+.sidebar {
+    grid-area: sidebar;
+    background-color: var(--surface-color);
+    border-right: 1px solid var(--border-color);
+    padding: 20px;
+    overflow-y: auto;
+}
+
+.sidebar h3 {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 16px;
+    color: var(--text-primary);
+}
+
+.tool-section {
+    margin-bottom: 24px;
+}
+
+.tool-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+}
+
+/* Properties Panel */
+.properties-panel {
+    grid-area: properties;
+    background-color: var(--surface-color);
+    border-left: 1px solid var(--border-color);
+    padding: 20px;
+    overflow-y: auto;
+}
+
+.property-group {
+    margin-bottom: 20px;
+}
+
+.property-group h4 {
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 12px;
+    color: var(--text-primary);
+}
+
+.property-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+}
+
+.property-label {
+    font-size: 13px;
+    color: var(--text-secondary);
+    flex: 1;
+}
+
+.property-input {
+    width: 80px;
+}
+
+.color-input {
+    width: 40px;
+    height: 32px;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    cursor: pointer;
+    padding: 0;
+    background: none;
+}
+
+.color-input::-webkit-color-swatch-wrapper {
+    padding: 0;
+}
+
+.color-input::-webkit-color-swatch {
+    border: none;
+    border-radius: 4px;
+}
+
+/* Canvas Controls */
+.canvas-controls {
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    z-index: 10;
+}
+
+.control-btn {
+    width: 40px;
+    height: 40px;
+    border: none;
+    border-radius: 50%;
+    background-color: var(--surface-color);
+    color: var(--text-primary);
+    cursor: pointer;
+    box-shadow: var(--shadow);
+    transition: all 0.2s ease;
+}
+
+.control-btn:hover {
+    background-color: var(--background-color);
+    transform: scale(1.05);
+}
+
+/* Zoom Controls */
+.zoom-controls {
+    position: absolute;
+    bottom: 20px;
+    left: 20px;
+    display: flex;
+    align-items: center;
+    background-color: var(--surface-color);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 8px;
+    box-shadow: var(--shadow);
+    z-index: 10;
+}
+
+.zoom-btn {
+    width: 32px;
+    height: 32px;
+    border: none;
+    background: none;
+    color: var(--text-primary);
+    cursor: pointer;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.zoom-btn:hover {
+    background-color: var(--background-color);
+}
+
+.zoom-level {
+    padding: 0 16px;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-primary);
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+    .sidebar,
+    .properties-panel {
+        display: none;
+    }
+    
+    .toolbar {
+        padding: 0 12px;
+    }
+    
+    .toolbar-left,
+    .toolbar-right {
+        gap: 8px;
+    }
+    
+    .tool-btn {
+        width: 36px;
+        height: 36px;
+    }
+    
+    .canvas-controls,
+    .zoom-controls {
+        position: fixed;
+    }
+    
+    .zoom-controls {
+        bottom: 80px;
+    }
+}
+
+/* Animation Classes */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.fade-in {
+    animation: fadeIn 0.3s ease;
+}
+
+/* Selection Styles */
+.selection-box {
+    position: absolute;
+    border: 2px dashed var(--primary-color);
+    background-color: rgba(37, 99, 235, 0.1);
+    pointer-events: none;
+    z-index: 5;
+}
+
+/* Tooltip Styles */
+.tooltip {
+    position: absolute;
+    background-color: var(--text-primary);
+    color: white;
+    padding: 6px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    pointer-events: none;
+    z-index: 1000;
+    white-space: nowrap;
+}
+
+.tooltip::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    margin-left: -4px;
+    border: 4px solid transparent;
+    border-top-color: var(--text-primary);
+}
