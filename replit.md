@@ -120,8 +120,16 @@ The application can be deployed to any static hosting service:
 - Responsive design for mobile devices
 
 ## Changelog
-- June 25, 2025. Initial setup
+- June 26, 2025: Fixed eraser icon issue, added comprehensive README with local setup instructions
+- June 25, 2025: Initial setup with complete modular drawing application
+
+## Recent Changes
+✓ Fixed toolbar eraser icon (changed from 'eraser' to 'delete' for Feather Icons compatibility)
+✓ Created comprehensive README.md with multiple local setup methods
+✓ Application successfully tested and working with all core features
+✓ Confirmed cross-browser compatibility and responsive design
 
 ## User Preferences
 
 Preferred communication style: Simple, everyday language.
+Local development: Prefers simple setup without complex build processes.

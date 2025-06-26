@@ -69,7 +69,7 @@ export class Toolbar {
     createToolButtons() {
         const tools = [
             { name: 'pen', icon: 'edit-3', title: 'Pen (P)' },
-            { name: 'eraser', icon: 'eraser', title: 'Eraser (E)' },
+            { name: 'eraser', icon: 'delete', title: 'Eraser (E)' },
             { name: 'rectangle', icon: 'square', title: 'Rectangle (R)' },
             { name: 'circle', icon: 'circle', title: 'Circle (C)' },
             { name: 'line', icon: 'minus', title: 'Line (L)' },
