@@ -1,6 +1,7 @@
 import { EventBus } from './core/EventBus.js';
 import { CanvasManager } from './core/CanvasManager.js';
 import { StateManager } from './core/StateManager.js';
+import { ObjectManager } from './core/ObjectManager.js';
 import { Toolbar } from './components/Toolbar.js';
 import { Canvas } from './components/Canvas.js';
 import { PropertiesPanel } from './components/PropertiesPanel.js';
@@ -13,9 +14,11 @@ class DrawingApp {
         this.eventBus = new EventBus();
         this.stateManager = new StateManager(this.eventBus);
         this.canvasManager = new CanvasManager(this.eventBus);
+        this.objectManager = new ObjectManager(this.eventBus);
         
         this.components = {};
         this.currentTool = null;
+        this.renderLoop = null;
         
         this.init();
     }
@@ -49,6 +52,7 @@ class DrawingApp {
         // to ensure DOM has settled and container has proper dimensions
         setTimeout(() => {
             this.canvasManager.init(this.components.canvas.getCanvasElement());
+            this.startRenderLoop();
         }, 100);
     }
 
@@ -101,6 +105,20 @@ class DrawingApp {
             this.loadProject();
         });
 
+        // Selection tool events
+        this.eventBus.on('selection:activated', () => {
+            this.eventBus.emit('objectManager:ready', this.objectManager);
+        });
+
+        // Object management
+        this.eventBus.on('objects:changed', () => {
+            this.redrawCanvas();
+        });
+
+        this.eventBus.on('canvas:redraw', () => {
+            this.redrawCanvas();
+        });
+
         // Keyboard shortcuts
         this.setupKeyboardShortcuts();
 
@@ -150,6 +168,9 @@ class DrawingApp {
 
             // Tool shortcuts
             switch (e.key) {
+                case 'v':
+                    this.eventBus.emit('tool:select', 'select');
+                    break;
                 case 'p':
                     this.eventBus.emit('tool:select', 'pen');
                     break;
@@ -199,6 +220,7 @@ class DrawingApp {
      */
     async loadTool(toolName) {
         const toolMap = {
+            select: './tools/SelectionTool.js',
             pen: './tools/PenTool.js',
             eraser: './tools/EraserTool.js',
             rectangle: './tools/RectangleTool.js',
@@ -218,7 +240,7 @@ class DrawingApp {
      * Select the default tool
      */
     selectDefaultTool() {
-        this.selectTool('pen');
+        this.selectTool('select');
     }
 
     /**
@@ -419,12 +441,214 @@ class DrawingApp {
     }
 
     /**
+     * Start render loop for object-based drawing
+     */
+    startRenderLoop() {
+        this.isRedrawing = false;
+        const render = () => {
+            if (!this.isRedrawing) {
+                this.redrawCanvas();
+            }
+            this.renderLoop = requestAnimationFrame(render);
+        };
+        render();
+    }
+
+    /**
+     * Stop render loop
+     */
+    stopRenderLoop() {
+        if (this.renderLoop) {
+            cancelAnimationFrame(this.renderLoop);
+            this.renderLoop = null;
+        }
+    }
+
+    /**
+     * Redraw canvas with all objects
+     */
+    redrawCanvas() {
+        if (!this.canvasManager.canvas || this.isRedrawing) return;
+        
+        this.isRedrawing = true;
+        
+        const ctx = this.canvasManager.ctx;
+        const canvas = this.canvasManager.canvas;
+        
+        // Clear canvas
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        
+        // Draw all objects
+        const objects = this.objectManager.getAllObjects();
+        objects.forEach(obj => {
+            if (obj.visible) {
+                this.drawObject(obj);
+            }
+        });
+        
+        // Draw selection if selection tool is active
+        if (this.currentTool && this.currentTool.constructor.name === 'SelectionTool') {
+            this.drawSelectionBox();
+        }
+        
+        this.isRedrawing = false;
+    }
+
+    /**
+     * Draw selection box for selected object
+     */
+    drawSelectionBox() {
+        const selectedObject = this.objectManager.getSelectedObject();
+        if (!selectedObject) return;
+        
+        const bounds = this.objectManager.getObjectBounds(selectedObject);
+        const ctx = this.canvasManager.ctx;
+        
+        ctx.save();
+        
+        // Draw selection outline
+        ctx.strokeStyle = '#2563eb';
+        ctx.lineWidth = 2;
+        ctx.setLineDash([5, 5]);
+        ctx.strokeRect(bounds.x - 2, bounds.y - 2, bounds.width + 4, bounds.height + 4);
+        
+        // Draw resize handles
+        ctx.fillStyle = '#2563eb';
+        ctx.setLineDash([]);
+        
+        const handleSize = 8;
+        const handles = [
+            { x: bounds.x, y: bounds.y },
+            { x: bounds.x + bounds.width / 2, y: bounds.y },
+            { x: bounds.x + bounds.width, y: bounds.y },
+            { x: bounds.x + bounds.width, y: bounds.y + bounds.height / 2 },
+            { x: bounds.x + bounds.width, y: bounds.y + bounds.height },
+            { x: bounds.x + bounds.width / 2, y: bounds.y + bounds.height },
+            { x: bounds.x, y: bounds.y + bounds.height },
+            { x: bounds.x, y: bounds.y + bounds.height / 2 }
+        ];
+        
+        handles.forEach(handle => {
+            ctx.fillRect(
+                handle.x - handleSize / 2,
+                handle.y - handleSize / 2,
+                handleSize,
+                handleSize
+            );
+        });
+        
+        ctx.restore();
+    }
+
+    /**
+     * Draw a single object
+     * @param {Object} obj - Object to draw
+     */
+    drawObject(obj) {
+        const ctx = this.canvasManager.ctx;
+        ctx.save();
+        
+        // Apply object properties
+        if (obj.properties) {
+            ctx.strokeStyle = obj.properties.strokeColor || '#000000';
+            ctx.fillStyle = obj.properties.fillColor || '#ffffff';
+            ctx.lineWidth = obj.properties.strokeWidth || 2;
+            ctx.lineCap = obj.properties.lineCap || 'round';
+            ctx.lineJoin = obj.properties.lineJoin || 'round';
+            if (obj.properties.opacity !== undefined) {
+                ctx.globalAlpha = obj.properties.opacity;
+            }
+        }
+        
+        // Draw based on object type
+        switch (obj.type) {
+            case 'rectangle':
+                if (obj.properties?.enableFill) {
+                    ctx.fillRect(obj.x, obj.y, obj.width, obj.height);
+                }
+                ctx.strokeRect(obj.x, obj.y, obj.width, obj.height);
+                break;
+                
+            case 'circle':
+                ctx.beginPath();
+                ctx.arc(obj.x, obj.y, obj.radius, 0, 2 * Math.PI);
+                if (obj.properties?.enableFill) {
+                    ctx.fill();
+                }
+                ctx.stroke();
+                break;
+                
+            case 'line':
+                if (obj.points && obj.points.length >= 2) {
+                    ctx.beginPath();
+                    ctx.moveTo(obj.points[0].x, obj.points[0].y);
+                    ctx.lineTo(obj.points[1].x, obj.points[1].y);
+                    ctx.stroke();
+                }
+                break;
+                
+            case 'arrow':
+                if (obj.points && obj.points.length >= 2) {
+                    this.drawArrowObject(obj);
+                }
+                break;
+                
+            case 'freehand':
+                if (obj.path && obj.path.length > 0) {
+                    ctx.beginPath();
+                    ctx.moveTo(obj.path[0].x, obj.path[0].y);
+                    for (let i = 1; i < obj.path.length; i++) {
+                        ctx.lineTo(obj.path[i].x, obj.path[i].y);
+                    }
+                    ctx.stroke();
+                }
+                break;
+        }
+        
+        ctx.restore();
+    }
+
+    /**
+     * Draw arrow object with arrowhead
+     * @param {Object} obj - Arrow object
+     */
+    drawArrowObject(obj) {
+        const ctx = this.canvasManager.ctx;
+        const p1 = obj.points[0];
+        const p2 = obj.points[1];
+        
+        // Draw line
+        ctx.beginPath();
+        ctx.moveTo(p1.x, p1.y);
+        ctx.lineTo(p2.x, p2.y);
+        ctx.stroke();
+        
+        // Draw arrowhead
+        const headLength = 15;
+        const angle = Math.atan2(p2.y - p1.y, p2.x - p1.x);
+        
+        ctx.beginPath();
+        ctx.moveTo(p2.x, p2.y);
+        ctx.lineTo(
+            p2.x - headLength * Math.cos(angle - Math.PI / 6),
+            p2.y - headLength * Math.sin(angle - Math.PI / 6)
+        );
+        ctx.moveTo(p2.x, p2.y);
+        ctx.lineTo(
+            p2.x - headLength * Math.cos(angle + Math.PI / 6),
+            p2.y - headLength * Math.sin(angle + Math.PI / 6)
+        );
+        ctx.stroke();
+    }
+
+    /**
      * Map tool class name to tool identifier
      * @param {string} className - Tool class name
      * @returns {string} Tool identifier
      */
     mapToolClassName(className) {
         const mapping = {
+            'SelectionTool': 'select',
             'PenTool': 'pen',
             'EraserTool': 'eraser',
             'RectangleTool': 'rectangle',
@@ -432,7 +656,7 @@ class DrawingApp {
             'LineTool': 'line',
             'ArrowTool': 'arrow'
         };
-        return mapping[className] || 'pen';
+        return mapping[className] || 'select';
     }
 
     /**

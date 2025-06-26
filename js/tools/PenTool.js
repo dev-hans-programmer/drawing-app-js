@@ -55,6 +55,21 @@ export default class PenTool extends BaseTool {
      */
     endDrawing(x, y, event) {
         if (this.path.length > 0) {
+            // Create object from path
+            const object = {
+                type: 'freehand',
+                path: [...this.path],
+                properties: {
+                    strokeColor: this.properties.strokeColor,
+                    strokeWidth: this.properties.strokeWidth,
+                    lineCap: this.properties.penStyle || 'round',
+                    opacity: this.properties.opacity || 1
+                }
+            };
+            
+            // Add to object manager
+            this.eventBus.emit('object:add', object);
+            
             // Finish the current stroke
             this.canvasManager.endDrawing();
         }

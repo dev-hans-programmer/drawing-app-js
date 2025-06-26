@@ -44,7 +44,28 @@ export default class CircleTool extends BaseTool {
         if (!this.startPoint) return;
         
         this.restoreCanvasState();
-        this.drawCircle(this.startPoint.x, this.startPoint.y, x, y);
+        
+        // Create object instead of drawing directly
+        const centerX = (this.startPoint.x + x) / 2;
+        const centerY = (this.startPoint.y + y) / 2;
+        const radius = Math.sqrt(Math.pow(x - this.startPoint.x, 2) + Math.pow(y - this.startPoint.y, 2)) / 2;
+        
+        const object = {
+            type: 'circle',
+            x: centerX,
+            y: centerY,
+            radius: radius,
+            properties: {
+                strokeColor: this.properties.strokeColor,
+                fillColor: this.properties.fillColor,
+                strokeWidth: this.properties.strokeWidth,
+                enableFill: this.enableFill,
+                opacity: this.properties.opacity || 1
+            }
+        };
+        
+        // Add to object manager
+        this.eventBus.emit('object:add', object);
         
         this.startPoint = null;
         this.eventBus.emit('canvas:change');

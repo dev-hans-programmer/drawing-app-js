@@ -44,7 +44,23 @@ export default class ArrowTool extends BaseTool {
         if (!this.startPoint) return;
         
         this.restoreCanvasState();
-        this.drawArrow(this.startPoint.x, this.startPoint.y, x, y);
+        
+        // Create object instead of drawing directly
+        const object = {
+            type: 'arrow',
+            points: [
+                { x: this.startPoint.x, y: this.startPoint.y },
+                { x: x, y: y }
+            ],
+            properties: {
+                strokeColor: this.properties.strokeColor,
+                strokeWidth: this.properties.strokeWidth,
+                opacity: this.properties.opacity || 1
+            }
+        };
+        
+        // Add to object manager
+        this.eventBus.emit('object:add', object);
         
         this.startPoint = null;
         this.eventBus.emit('canvas:change');

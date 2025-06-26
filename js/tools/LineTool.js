@@ -43,7 +43,23 @@ export default class LineTool extends BaseTool {
         if (!this.startPoint) return;
         
         this.restoreCanvasState();
-        this.drawLine(this.startPoint.x, this.startPoint.y, x, y);
+        
+        // Create object instead of drawing directly
+        const object = {
+            type: 'line',
+            points: [
+                { x: this.startPoint.x, y: this.startPoint.y },
+                { x: x, y: y }
+            ],
+            properties: {
+                strokeColor: this.properties.strokeColor,
+                strokeWidth: this.properties.strokeWidth,
+                opacity: this.properties.opacity || 1
+            }
+        };
+        
+        // Add to object manager
+        this.eventBus.emit('object:add', object);
         
         this.startPoint = null;
         this.eventBus.emit('canvas:change');

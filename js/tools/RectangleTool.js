@@ -47,7 +47,28 @@ export default class RectangleTool extends BaseTool {
         if (!this.startPoint) return;
         
         this.restoreCanvasState();
-        this.drawRectangle(this.startPoint.x, this.startPoint.y, x, y);
+        
+        // Create object instead of drawing directly
+        const width = x - this.startPoint.x;
+        const height = y - this.startPoint.y;
+        
+        const object = {
+            type: 'rectangle',
+            x: Math.min(this.startPoint.x, x),
+            y: Math.min(this.startPoint.y, y),
+            width: Math.abs(width),
+            height: Math.abs(height),
+            properties: {
+                strokeColor: this.properties.strokeColor,
+                fillColor: this.properties.fillColor,
+                strokeWidth: this.properties.strokeWidth,
+                enableFill: this.enableFill,
+                opacity: this.properties.opacity || 1
+            }
+        };
+        
+        // Add to object manager
+        this.eventBus.emit('object:add', object);
         
         this.startPoint = null;
         this.removePreviewCanvas();
