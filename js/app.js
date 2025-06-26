@@ -45,8 +45,11 @@ class DrawingApp {
         appContainer.appendChild(this.components.canvas.mount());
         appContainer.appendChild(this.components.propertiesPanel.mount());
 
-        // Initialize canvas manager with the canvas element
-        this.canvasManager.init(this.components.canvas.getCanvasElement());
+        // Initialize canvas manager with the canvas element after a brief delay
+        // to ensure DOM has settled and container has proper dimensions
+        setTimeout(() => {
+            this.canvasManager.init(this.components.canvas.getCanvasElement());
+        }, 100);
     }
 
     /**

@@ -15,8 +15,8 @@ export class CanvasManager {
         this.zoom = 1;
         this.panX = 0;
         this.panY = 0;
-        this.canvasWidth = 800;
-        this.canvasHeight = 600;
+        this.canvasWidth = 1200;
+        this.canvasHeight = 800;
         
         // Drawing properties
         this.strokeColor = '#000000';
@@ -36,7 +36,8 @@ export class CanvasManager {
         this.canvas = canvas;
         this.ctx = canvas.getContext('2d');
         
-        this.setCanvasSize(this.canvasWidth, this.canvasHeight);
+        // Auto-size canvas to container
+        this.autoSizeCanvas();
         this.updateTransform();
         
         // Set initial drawing properties
@@ -81,19 +82,30 @@ export class CanvasManager {
     }
 
     /**
-     * Update canvas transform (zoom and pan)
+     * Auto-size canvas to fit container
      */
-    updateTransform() {
+    autoSizeCanvas() {
         if (!this.canvas) return;
         
         const container = this.canvas.parentElement;
         const containerRect = container.getBoundingClientRect();
         
-        // Center the canvas
-        const x = (containerRect.width - this.canvasWidth * this.zoom) / 2 + this.panX;
-        const y = (containerRect.height - this.canvasHeight * this.zoom) / 2 + this.panY;
+        // Make canvas fill the entire container
+        this.canvasWidth = containerRect.width;
+        this.canvasHeight = containerRect.height;
         
-        this.canvas.style.transform = `translate(${x}px, ${y}px) scale(${this.zoom})`;
+        this.setCanvasSize(this.canvasWidth, this.canvasHeight);
+    }
+
+    /**
+     * Update canvas transform (zoom and pan)
+     */
+    updateTransform() {
+        if (!this.canvas) return;
+        
+        // Apply zoom and pan transforms
+        this.canvas.style.transform = `scale(${this.zoom}) translate(${this.panX}px, ${this.panY}px)`;
+        this.canvas.style.transformOrigin = 'center center';
     }
 
     /**

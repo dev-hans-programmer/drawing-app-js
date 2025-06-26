@@ -272,15 +272,16 @@ export class Canvas {
         const container = this.element.querySelector('.canvas-wrapper');
         const containerRect = container.getBoundingClientRect();
         
-        const scaleX = containerRect.width / this.canvasManager.canvasWidth;
-        const scaleY = containerRect.height / this.canvasManager.canvasHeight;
-        const scale = Math.min(scaleX, scaleY) * 0.9; // 90% of available space
+        // Make canvas fill the available space
+        this.canvasManager.canvasWidth = Math.max(1200, containerRect.width);
+        this.canvasManager.canvasHeight = Math.max(800, containerRect.height);
+        this.canvasManager.setCanvasSize(this.canvasManager.canvasWidth, this.canvasManager.canvasHeight);
         
-        this.canvasManager.zoom = scale;
+        this.canvasManager.zoom = 1;
         this.canvasManager.panX = 0;
         this.canvasManager.panY = 0;
         this.canvasManager.updateTransform();
-        this.eventBus.emit('zoom:changed', scale);
+        this.eventBus.emit('zoom:changed', 1);
     }
 
     /**
@@ -297,6 +298,8 @@ export class Canvas {
      * Handle window resize
      */
     handleResize() {
+        // Resize canvas to fit new container size
+        this.canvasManager.autoSizeCanvas();
         this.canvasManager.updateTransform();
     }
 
