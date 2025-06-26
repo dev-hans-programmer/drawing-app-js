@@ -106,6 +106,20 @@ export class Toolbar {
             </button>
             
             <button class="btn btn-secondary" 
+                    data-action="save-project" 
+                    title="Save Project">
+                <i data-feather="save"></i>
+                Save
+            </button>
+            
+            <button class="btn btn-secondary" 
+                    data-action="load-project" 
+                    title="Load Project">
+                <i data-feather="folder-open"></i>
+                Load
+            </button>
+            
+            <button class="btn btn-secondary" 
                     data-action="clear" 
                     title="Clear Canvas">
                 <i data-feather="trash-2"></i>
@@ -161,6 +175,12 @@ export class Toolbar {
                 break;
             case 'redo':
                 this.eventBus.emit('action:redo');
+                break;
+            case 'save-project':
+                this.eventBus.emit('action:save-project');
+                break;
+            case 'load-project':
+                this.eventBus.emit('action:load-project');
                 break;
             case 'clear':
                 if (confirm('Are you sure you want to clear the canvas?')) {

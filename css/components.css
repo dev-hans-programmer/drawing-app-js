@@ -315,3 +315,127 @@
     border: 4px solid transparent;
     border-top-color: var(--text-primary);
 }
+
+/* Notification Styles */
+.notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 12px 20px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    z-index: 2000;
+    min-width: 250px;
+    max-width: 400px;
+    box-shadow: var(--shadow-lg);
+    animation: slideInRight 0.3s ease, fadeOut 0.3s ease 2.7s;
+    animation-fill-mode: forwards;
+}
+
+.notification-success {
+    background-color: #10b981;
+    color: white;
+    border: 1px solid #059669;
+}
+
+.notification-error {
+    background-color: #ef4444;
+    color: white;
+    border: 1px solid #dc2626;
+}
+
+.notification-info {
+    background-color: var(--primary-color);
+    color: white;
+    border: 1px solid #1d4ed8;
+}
+
+@keyframes slideInRight {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes fadeOut {
+    from {
+        opacity: 1;
+    }
+    to {
+        opacity: 0;
+        transform: translateX(100%);
+    }
+}
+
+/* File Input Styles */
+.file-input-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1500;
+}
+
+.file-input-dialog {
+    background-color: var(--surface-color);
+    border-radius: 12px;
+    padding: 30px;
+    max-width: 400px;
+    width: 90%;
+    box-shadow: var(--shadow-lg);
+    text-align: center;
+}
+
+.file-input-dialog h3 {
+    margin-bottom: 20px;
+    color: var(--text-primary);
+}
+
+.file-input-dialog p {
+    margin-bottom: 20px;
+    color: var(--text-secondary);
+    line-height: 1.5;
+}
+
+.file-input-buttons {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+}
+
+/* Project Info Styles */
+.project-info {
+    background-color: var(--background-color);
+    border-radius: 6px;
+    padding: 16px;
+    margin: 16px 0;
+    border-left: 4px solid var(--primary-color);
+}
+
+.project-info h4 {
+    margin: 0 0 8px 0;
+    color: var(--text-primary);
+}
+
+.project-info .meta {
+    font-size: 12px;
+    color: var(--text-secondary);
+    margin: 4px 0;
+}
+
+.project-info .description {
+    font-size: 14px;
+    color: var(--text-primary);
+    margin: 8px 0;
+    font-style: italic;
+}
